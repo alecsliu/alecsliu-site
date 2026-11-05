@@ -14,7 +14,9 @@ library/index.html         ← Personal library: your blurb + LibraryThing catal
 le-petit-prince/index.html ← Le Petit Prince: covers from a LibraryThing collection
 travel/index.html          ← Travel: list of places
 travel/*.html              ← one page per place
-templates/place.html       ← copy this to add a travel place
+templates/place.html       ← travel: a city guide (bookstores, cafés…)
+templates/list.html        ← travel: a themed list, e.g. "Hikes of 2026"
+templates/trip.html        ← travel: a day-by-day trip journal
 templates/page.html        ← copy this for any other kind of page
 api/goodreads.js           ← fetches your Goodreads shelf (Goodreads user ID goes here)
 js/librarything.js         ← loads your LibraryThing catalogue (username goes here)

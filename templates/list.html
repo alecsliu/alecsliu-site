@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  LIST TEMPLATE: a themed collection, e.g. "Hikes of 2026",
+  "Favourite bookstores of the world", "Best coffee I've had".
+  1. Copy into the travel folder and rename, e.g. travel/hikes-2026.html
+  2. Replace "List title" in the <title>, the breadcrumb and the <h1>.
+  3. Copy one <li class="entry">…</li> block per item.
+     The "meta" line is for quick facts. Use whatever fits the list:
+     hikes → place · date · distance · elevation
+     bookstores → city · neighbourhood
+  4. Add a link to it on travel/index.html under "Guides & lists".
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>List title · Alec Liu</title>
+  <meta name="theme-color" content="#12301f">
+  <link rel="icon" href="../favicon-dragon.png?v=3" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main>
+    <nav class="crumbs"><a href="../index.html">Alec Liu</a><span class="sep">/</span><a href="index.html">Travel</a><span class="sep">/</span>List title</nav>
+
+    <h1>List title</h1>
+
+    <!-- A few lines introducing the list. -->
+    <p class="intro">What this list is, and how you picked what's on it.</p>
+
+    <ol class="entries">
+
+      <!-- ===== ONE ITEM: copy from here… ===== -->
+      <li class="entry">
+        <h3>Name of the hike</h3>
+        <p class="meta">
+          <span>Place, Country</span>
+          <span>March 2026</span>
+          <span>12 km</span>
+          <span>650 m elevation</span>
+        </p>
+        <p>A few lines about it: what made it memorable, the best stretch, anything to know before going.</p>
+        <!-- Optional photo (put the file in /images): -->
+        <img src="../images/example-photo.svg" alt="Describe the photo">
+        <!-- Optional link (map, trail page, website): -->
+        <p><a href="https://maps.google.com/?q=Trail+name" target="_blank" rel="noopener">Map</a></p>
+      </li>
+      <!-- ===== …to here ===== -->
+
+    </ol>
+
+    <footer>© 2026 Alec Liu</footer>
+  </main>
+</body>
+</html>
