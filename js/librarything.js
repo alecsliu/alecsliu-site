@@ -74,3 +74,77 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
     });
   };
 })();
+
+// ------------------------------------------------------------
+// Cover grid, shared by both pages.
+//   renderCovers(element, books, { notes: {...} })
+// With notes, clicking a cover opens a panel with the note.
+// ------------------------------------------------------------
+(function () {
+  function findNote(book, notes) {
+    if (!notes) return "";
+    if (notes[book.id]) return notes[book.id];
+    function norm(x) { return String(x).normalize("NFC").replace(/[\u2018\u2019]/g, "'").trim().toLowerCase(); }
+    var t = norm(book.title);
+    var keys = Object.keys(notes).sort(function (a, b) { return b.length - a.length; });
+    for (var i = 0; i < keys.length; i++) {
+      var k = norm(keys[i]);
+      if (k && t.indexOf(k) !== -1 && String(notes[keys[i]]).trim()) return notes[keys[i]];
+    }
+    return "";
+  }
+
+  function langName(code) {
+    try {
+      var n = new Intl.DisplayNames(["en"], { type: "language" }).of(code);
+      return n && n !== code ? n : code;
+    } catch (e) { return code; }
+  }
+
+  var dialog;
+  function openPanel(book, note) {
+    if (!dialog) {
+      dialog = document.createElement("dialog");
+      dialog.className = "panel";
+      document.body.appendChild(dialog);
+      dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+    }
+    var meta = [book.language && langName(book.language), book.date].filter(Boolean).join(" · ");
+    dialog.innerHTML =
+      '<button class="close" aria-label="Close">×</button>' +
+      '<div class="panel-body">' +
+        (book.cover ? '<img src="' + escapeHTML(book.cover) + '" alt="">' : "") +
+        "<div><h3>" + escapeHTML(book.title) + "</h3>" +
+        (meta ? '<p class="muted">' + escapeHTML(meta) + "</p>" : "") +
+        (note ? '<div class="note">' + note + "</div>" : "") +
+        '<p><a href="' + escapeHTML(book.link) + '" target="_blank" rel="noopener">View on LibraryThing</a></p></div>' +
+      "</div>";
+    dialog.querySelector(".close").onclick = function () { dialog.close(); };
+    dialog.showModal();
+  }
+
+  window.renderCovers = function (el, books, opts) {
+    opts = opts || {};
+    if (!books.length) { el.innerHTML = '<p class="status">' + (opts.empty || "Nothing here.") + "</p>"; return; }
+    el.innerHTML = '<ul class="covers">' + books.map(function (b, i) {
+      var art = b.cover ? '<img src="' + escapeHTML(b.cover) + '" alt="" loading="lazy">' : "<span>" + escapeHTML(b.title) + "</span>";
+      var meta = [b.language && langName(b.language), b.date].filter(Boolean).join(" · ");
+      var hasNote = opts.notes && findNote(b, opts.notes);
+      var open = opts.notes ? '<a href="#" data-i="' + i + '">' : '<a href="' + escapeHTML(b.link) + '" target="_blank" rel="noopener">';
+      return "<li>" + open + '<span class="art">' + art + '</span><span class="cap">' + escapeHTML(b.title) +
+        (b.author && opts.showAuthor ? "<small>" + escapeHTML(b.author) + "</small>" : "") +
+        (meta && !opts.showAuthor ? "<small>" + escapeHTML(meta) + "</small>" : "") +
+        (hasNote ? '<small class="has-note">Note</small>' : "") +
+        "</span></a></li>";
+    }).join("") + "</ul>";
+    if (opts.notes) {
+      el.querySelectorAll("a[data-i]").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          var b = books[+a.getAttribute("data-i")];
+          openPanel(b, findNote(b, opts.notes));
+        });
+      });
+    }
+  };
+})();

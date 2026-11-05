@@ -34,20 +34,13 @@
     <script>
       (function () {
         var box = document.getElementById("books"), q = document.getElementById("q"), all = [];
-
-        function render(list) {
-          if (!list.length) { box.innerHTML = '<p class="status">No matches.</p>'; return; }
-          box.innerHTML = '<ul class="books">' + list.map(function (b) {
-            return '<li><span class="book"><a href="' + escapeHTML(b.link) + '" target="_blank" rel="noopener">' + escapeHTML(b.title) +
-                   '</a><span class="by">' + escapeHTML(b.author) + '</span></span></li>';
-          }).join("") + "</ul>";
-        }
+        function show(list) { renderCovers(box, list, { showAuthor: true, empty: "No matches." }); }
 
         loadLibraryThing(function (books) {
           all = books.sort(function (a, b) { return a.authorSort.localeCompare(b.authorSort) || a.title.localeCompare(b.title); });
           document.getElementById("count").textContent = all.length + " books";
           q.hidden = false;
-          render(all);
+          show(all);
         }, function (why) {
           box.innerHTML = why === "not-configured"
             ? '<p class="status">LibraryThing isn\'t connected yet.</p>'
@@ -56,7 +49,9 @@
 
         q.addEventListener("input", function () {
           var s = q.value.trim().toLowerCase();
-          render(!s ? all : all.filter(function (b) { return (b.title + " " + b.author).toLowerCase().indexOf(s) !== -1; }));
+          var list = !s ? all : all.filter(function (b) { return (b.title + " " + b.author).toLowerCase().indexOf(s) !== -1; });
+          document.getElementById("count").textContent = s ? list.length + " of " + all.length + " books" : all.length + " books";
+          show(list);
         });
       })();
     </script>

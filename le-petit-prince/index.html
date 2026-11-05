@@ -28,19 +28,14 @@
     <div id="books"><p class="status">Loading the collection from LibraryThing…</p></div>
 
     <script src="../js/librarything.js"></script>
+    <script src="notes.js"></script>
     <script>
       (function () {
         var box = document.getElementById("books");
         loadLibraryThing(function (books) {
           var list = books.filter(function (b) { return inCollection(b, LT_PETIT_PRINCE_COLLECTION); });
-          if (!list.length) { box.innerHTML = '<p class="status">No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.</p>'; return; }
-          document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions");
-          box.innerHTML = '<ul class="covers">' + list.map(function (b) {
-            var art = b.cover ? '<img src="' + escapeHTML(b.cover) + '" alt="" loading="lazy">' : '<span>' + escapeHTML(b.title) + '</span>';
-            var meta = [b.language, b.date].filter(Boolean).join(" · ");
-            return '<li><a href="' + escapeHTML(b.link) + '" target="_blank" rel="noopener"><span class="art">' + art +
-                   '</span><span class="cap">' + escapeHTML(b.title) + (meta ? "<small>" + escapeHTML(meta) + "</small>" : "") + "</span></a></li>";
-          }).join("") + "</ul>";
+          if (list.length) document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions") + " · click a cover for notes";
+          renderCovers(box, list, { notes: window.PETIT_PRINCE_NOTES || {}, empty: 'No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.' });
         }, function (why) {
           box.innerHTML = why === "not-configured"
             ? '<p class="status">LibraryThing isn\'t connected yet.</p>'

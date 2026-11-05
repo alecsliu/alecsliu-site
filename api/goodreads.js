@@ -46,13 +46,22 @@ module.exports = async function handler(req, res) {
   try {
     for (let page = 1; page <= MAX_PAGES; page++) {
       const url = `https://www.goodreads.com/review/list_rss/${GOODREADS_USER_ID}?shelf=${SHELF}&page=${page}`;
-      const r = await fetch(url, { headers: { "User-Agent": "alecsliu.com reading page" } });
+      const r = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; alecsliu.com reading page)",
+          "Accept": "application/rss+xml, application/xml, text/xml, */*",
+        },
+        signal: AbortSignal.timeout(8000),
+      });
       if (!r.ok) {
-        if (page === 1) throw new Error(`Goodreads responded ${r.status}`);
+        if (page === 1) throw new Error(`Goodreads responded with status ${r.status}`);
         break;
       }
       const xml = await r.text();
       const items = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
+      if (page === 1 && items.length === 0 && !/<rss/i.test(xml)) {
+        throw new Error("Goodreads didn't return a feed (the shelf may be private): " + xml.slice(0, 120));
+      }
       let added = 0;
       for (const item of items) {
         const id = pick(item, "book_id") || pick(item, "guid");

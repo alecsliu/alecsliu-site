@@ -280,3 +280,41 @@ footer {
 .spots .where { color: var(--muted); font-size: 0.9rem; margin-left: 6px; }
 .spots p { margin: 4px 0 0; }
 .spots img { margin: 12px 0 0; }
+
+/* ---------- Book panel (opens when a Le Petit Prince cover is clicked) ---------- */
+
+.covers .has-note { color: var(--accent); }
+
+dialog.panel {
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 48px);
+  overflow: auto;
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 28px;
+}
+dialog.panel::backdrop { background: rgba(5, 15, 10, 0.7); }
+dialog.panel .panel-body { display: flex; gap: 22px; align-items: flex-start; }
+dialog.panel img { width: 140px; flex: none; margin: 0; border-radius: 4px; }
+dialog.panel h3 { margin: 0 0 4px; }
+dialog.panel .note { margin: 16px 0; }
+dialog.panel .note p { margin: 0 0 12px; }
+dialog.panel .close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+dialog.panel .close:hover { color: var(--text); }
+
+@media (max-width: 520px) {
+  dialog.panel .panel-body { flex-direction: column; }
+  dialog.panel img { width: 120px; }
+}
