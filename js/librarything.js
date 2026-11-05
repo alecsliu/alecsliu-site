@@ -87,6 +87,7 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
     if (notes[book.id]) return notes[book.id];
     function norm(x) { return String(x).normalize("NFC").replace(/[\u2018\u2019]/g, "'").trim().toLowerCase(); }
     var t = norm(book.title);
+    for (var k0 in notes) { if (norm(k0) === t && String(notes[k0]).trim()) return notes[k0]; }
     var keys = Object.keys(notes).sort(function (a, b) { return b.length - a.length; });
     for (var i = 0; i < keys.length; i++) {
       var k = norm(keys[i]);

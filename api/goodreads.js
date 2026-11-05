@@ -82,7 +82,9 @@ module.exports = async function handler(req, res) {
     show_tags: "0",
     cover_size: "large",
     cover_position: "left",
-    widget_id: "alecsliu",
+    // Goodreads caches widgets by widget_id, so the ID changes with the
+    // number of books and once an hour to always get a fresh list.
+    widget_id: `alecsliu${NUM_BOOKS}x${Math.floor(Date.now() / 3600000)}`,
   });
   const url = `https://www.goodreads.com/review/custom_widget/${GOODREADS_USER_ID}.Read?${params}`;
 
