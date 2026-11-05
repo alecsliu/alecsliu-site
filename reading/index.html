@@ -35,12 +35,12 @@
     <h1>Reading</h1>
 
     <p class="intro">
-      The Goodreads feed below shows my 10 most recent books. Currently, I'm reading
+      The Hardcover feed below shows my 10 most recent books. Currently, I'm reading
       <em>Puertas demasiado pequeñas</em> by Ave Barrera and
       <em>One Day in the Life of Ivan Denisovich</em> by Alexander Solzhenitsyn.
     </p>
 
-    <div id="books"><p class="status">Loading books from Goodreads…</p></div>
+    <div id="books"><p class="status">Loading books…</p></div>
 
     <script src="../reading/notes.js"></script>
     <script>
@@ -59,9 +59,11 @@
           }
           return "";
         }
+        var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        function fmtDate(d) { var p = String(d).slice(0, 10).split("-"); return p.length === 3 ? MONTHS[+p[1] - 1] + " " + (+p[2]) + ", " + p[0] : esc(d); }
         function fail() { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; }
 
-        fetch("../api/goodreads")
+        fetch("../api/reading")
           .then(function (r) { return r.json(); })
           .then(function (data) {
             if (data.error || !data.books || !data.books.length) return fail();
@@ -70,7 +72,8 @@
               var note = noteFor(b.title);
               return '<li><a class="cover" href="' + esc(b.link) + '" target="_blank" rel="noopener">' + art + '</a>' +
                      '<div class="info"><a class="t" href="' + esc(b.link) + '" target="_blank" rel="noopener">' + esc(b.title) + '</a>' +
-                     (b.author ? '<span class="by">' + esc(b.author) + '</span>' : '') + '</div>' +
+                     (b.author ? '<span class="by">' + esc(b.author) + '</span>' : '') +
+                     (b.finished ? '<span class="when">Finished ' + fmtDate(b.finished) + '</span>' : '') + '</div>' +
                      '<div class="comment">' + note + '</div></li>';
             }).join("") + "</ul>";
           })
@@ -80,7 +83,7 @@
 
     <footer>
       <ul class="social">
-        <li><a href="https://www.goodreads.com/user/show/160897919" target="_blank" rel="noopener" aria-label="Goodreads"><span class="icon icon-goodreads" aria-hidden="true"></span>Goodreads</a></li>
+        <li><a href="https://hardcover.app/@alecsliu" target="_blank" rel="noopener" aria-label="Hardcover"><span class="icon icon-hardcover" aria-hidden="true"></span>Hardcover</a></li>
         <li><a href="https://alecsliu.substack.com/" target="_blank" rel="noopener" aria-label="Substack"><span class="icon icon-substack" aria-hidden="true"></span>Substack</a></li>
       </ul>
       © 2026 Alec Liu

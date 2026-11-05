@@ -9,7 +9,7 @@ index.html                 ← home page
 style.css                  ← colors, fonts, spacing for the whole site
 favicon.svg                ← the little icon in the browser tab
 images/                    ← put photos here
-reading/index.html         ← Reading: books pulled from Goodreads automatically
+reading/index.html         ← Reading: books pulled from Hardcover automatically
 library/index.html         ← Personal library: your blurb + LibraryThing catalogue
 le-petit-prince/index.html ← Le Petit Prince: covers from a LibraryThing collection
 travel/index.html          ← Travel: list of places
@@ -18,7 +18,8 @@ templates/place.html       ← travel: a city guide (bookstores, cafés…)
 templates/list.html        ← travel: a themed list, e.g. "Hikes of 2026"
 templates/trip.html        ← travel: a day-by-day trip journal
 templates/page.html        ← copy this for any other kind of page
-api/goodreads.js           ← fetches your Goodreads shelf (Goodreads user ID goes here)
+api/reading.js             ← fetches your Hardcover reading list (key: HARDCOVER_TOKEN in Vercel)
+api/_goodreads.js          ← backup source, used only if Hardcover fails
 js/librarything.js         ← loads your LibraryThing catalogue (username goes here)
 ```
 

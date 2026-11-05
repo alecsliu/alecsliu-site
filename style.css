@@ -415,7 +415,7 @@ dialog.panel .close:hover { color: var(--text); }
   -webkit-mask: var(--icon) center / contain no-repeat;
           mask: var(--icon) center / contain no-repeat;
 }
-.icon-goodreads { --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@13/icons/goodreads.svg"); }
+.icon-hardcover { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/%3E%3C/svg%3E"); }
 .icon-substack  { --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@13/icons/substack.svg"); }
 .spots a.name { color: var(--text); border-bottom: 1px solid rgba(183, 228, 199, 0.35); }
 .spots a.name:hover { color: var(--accent); border-bottom-color: var(--accent); }
@@ -504,3 +504,5 @@ footer .updated { margin: 0 0 4px; }
 }
 .map-zoom button:hover { border-color: var(--accent); color: var(--accent); }
 .map-zoom button.reset { font-size: 0.95rem; }
+
+.reads .when { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 4px; font-variant-numeric: tabular-nums; }

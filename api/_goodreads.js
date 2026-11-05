@@ -1,7 +1,8 @@
 // ============================================================
 // Goodreads → JSON, for the Reading page.
 //
-// Vercel runs this file on its servers at  /api/goodreads
+// Backup source for the Reading page, used only if Hardcover isn't
+// set up or doesn't respond. (Files starting with _ aren't public pages.)
 //
 // Goodreads shut down its shelf RSS feeds in October 2026, so this
 // reads Goodreads' public "bookshelf widget" instead (the thing
@@ -68,39 +69,23 @@ function parseWidget(raw) {
   }).filter((b) => b.title);
 }
 
-module.exports = async function handler(req, res) {
+async function fetchGoodreads() {
   const params = new URLSearchParams({
-    shelf: SHELF,
-    sort: "date_read",
-    order: "d",
-    num_books: String(NUM_BOOKS),
-    show_author: "1",
-    show_cover: "1",
-    show_title: "1",
-    show_rating: "0",
-    show_review: "0",
-    show_tags: "0",
-    cover_size: "large",
-    cover_position: "left",
-    // Goodreads caches widgets by widget_id, so the ID changes with the
-    // number of books and once an hour to always get a fresh list.
+    shelf: SHELF, sort: "date_read", order: "d", num_books: String(NUM_BOOKS),
+    show_author: "1", show_cover: "1", show_title: "1", show_rating: "0", show_review: "0", show_tags: "0",
+    cover_size: "large", cover_position: "left",
+    // Goodreads caches widgets by widget_id; vary it so changes apply and the list stays fresh.
     widget_id: `alecsliu${NUM_BOOKS}x${Math.floor(Date.now() / 3600000)}`,
   });
   const url = `https://www.goodreads.com/review/custom_widget/${GOODREADS_USER_ID}.Read?${params}`;
+  const r = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; alecsliu.com reading page)" },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) throw new Error(`Goodreads responded with status ${r.status}`);
+  const books = parseWidget(await r.text()).slice(0, NUM_BOOKS);
+  if (!books.length) throw new Error("No books found in the Goodreads widget");
+  return books;
+}
 
-  try {
-    const r = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; alecsliu.com reading page)" },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!r.ok) throw new Error(`Goodreads responded with status ${r.status}`);
-    const raw = await r.text();
-    const books = parseWidget(raw).slice(0, NUM_BOOKS);
-    if (!books.length) throw new Error("Couldn't find any books in the Goodreads widget. Start of response: " + raw.slice(0, 300));
-
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
-    res.status(200).json({ configured: true, books });
-  } catch (err) {
-    res.status(502).json({ configured: true, error: String(err.message || err), books: [] });
-  }
-};
+module.exports = { fetchGoodreads };
