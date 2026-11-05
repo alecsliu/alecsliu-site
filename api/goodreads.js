@@ -14,7 +14,7 @@
 
 const GOODREADS_USER_ID = process.env.GOODREADS_USER_ID || "160897919";
 const SHELF = "read";
-const NUM_BOOKS = 5; // how many books to show
+const NUM_BOOKS = 10; // how many books to show
 
 // ------------------------------------------------------------
 

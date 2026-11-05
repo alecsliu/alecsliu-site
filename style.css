@@ -318,3 +318,36 @@ dialog.panel .close:hover { color: var(--text); }
   dialog.panel .panel-body { flex-direction: column; }
   dialog.panel img { width: 120px; }
 }
+
+/* ---------- Reading: one book per row, with a comment beside it ---------- */
+
+.reads { list-style: none; margin: 0; padding: 0; }
+.reads li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 18px;
+  align-items: start;
+  padding: 16px 0;
+  border-top: 1px solid var(--rule);
+}
+.reads li:last-child { border-bottom: 1px solid var(--rule); }
+.reads .cover {
+  display: block;
+  border-bottom: none;
+  aspect-ratio: 2 / 3;
+  background: var(--bg-raised);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.reads .cover img { width: 100%; height: 100%; object-fit: cover; margin: 0; border-radius: 0; }
+.reads .t { color: var(--text); border-bottom: none; font-weight: 600; line-height: 1.4; display: block; }
+.reads .t:hover { color: var(--accent); }
+.reads .by { display: block; color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
+.reads .comment { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+.reads .comment p { margin: 0 0 8px; }
+.reads .comment:empty { display: none; }
+
+@media (max-width: 560px) {
+  .reads li { grid-template-columns: 56px minmax(0, 1fr); }
+  .reads .comment { grid-column: 2; }
+}
