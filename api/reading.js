@@ -10,6 +10,7 @@
 const { fetchGoodreads } = require("./_goodreads.js");
 
 const NUM_BOOKS = 10; // how many books to show
+const USERNAME = "alecsliu"; // hardcover.app/@alecsliu
 const API = "https://api.hardcover.app/v1/graphql";
 
 const BOOK_FIELDS = `book { title slug image { url } contributions { author { name } } }`;
@@ -22,6 +23,15 @@ const QUERY_SORTED = `query ($n: Int!) {
       user_book_reads { finished_at }
       ${BOOK_FIELDS}
     }
+  }
+}`;
+
+// Same, looked up by username (works with a public-library-only key).
+const QUERY_BY_USER = `query ($n: Int!, $u: citext!) {
+  user_books(where: { status_id: { _eq: 3 }, user: { username: { _eq: $u } } }, order_by: [{ last_read_date: desc_nulls_last }, { id: desc }], limit: $n) {
+    last_read_date
+    user_book_reads { finished_at }
+    ${BOOK_FIELDS}
   }
 }`;
 
@@ -45,11 +55,14 @@ async function hardcover(query, variables) {
     body: JSON.stringify({ query, variables }),
     signal: AbortSignal.timeout(8000),
   });
-  const data = await r.json().catch(() => ({}));
+  const text = await r.text();
+  let data = {};
+  try { data = JSON.parse(text); } catch (e) {}
   if (!r.ok || data.errors) {
-    const msg = (data.errors && data.errors.map((e) => e.message).join("; ")) || `status ${r.status}`;
+    const msg = (data.errors && data.errors.map((e) => e.message).join("; ")) || `status ${r.status}: ${text.slice(0, 200)}`;
     throw new Error("Hardcover: " + msg);
   }
+  if (data.data.user_books) return data.data.user_books;
   const me = Array.isArray(data.data.me) ? data.data.me[0] : data.data.me;
   if (!me) throw new Error("Hardcover: no user for this API key");
   return me.user_books || [];
@@ -70,13 +83,20 @@ function toBook(ub) {
 }
 
 async function fetchHardcover() {
-  let rows;
-  try {
-    rows = await hardcover(QUERY_SORTED, { n: NUM_BOOKS });
-  } catch (e) {
-    if (/HARDCOVER_TOKEN|no user/i.test(e.message)) throw e;
-    rows = await hardcover(QUERY_RECENT, {}); // older schema without last_read_date
+  const attempts = [
+    () => hardcover(QUERY_SORTED, { n: NUM_BOOKS }),
+    () => hardcover(QUERY_BY_USER, { n: NUM_BOOKS, u: USERNAME }),
+    () => hardcover(QUERY_RECENT, {}), // older schema without last_read_date
+  ];
+  let rows = null, errors = [];
+  for (const attempt of attempts) {
+    try { rows = await attempt(); break; }
+    catch (e) {
+      if (/HARDCOVER_TOKEN/.test(e.message)) throw e;
+      errors.push(e.message);
+    }
   }
+  if (!rows) throw new Error(errors.join(" || "));
   return rows
     .map(toBook)
     .filter((b) => b.title)
