@@ -32,16 +32,14 @@
     var countryList = Object.keys(countries).sort();
 
     root.innerHTML =
-      '<div class="map-bar"><p class="count">' + placed.length + (placed.length === 1 ? " copy" : " copies") + " · " +
-        cityKeys.length + (cityKeys.length === 1 ? " city" : " cities") + " · " +
-        countryList.length + (countryList.length === 1 ? " country" : " countries") + "</p>" +
+      '<div class="map-bar">' +
         '<label class="map-select"><span class="sr-only">Show country</span><select>' +
           '<option value="">All countries</option>' +
           countryList.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("") +
         "</select></label></div>" +
       '<div class="map-wrap"><svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of where each copy was bought">' +
         '<path class="land" d="' + M.land + '"/><path class="borders" d="' + M.borders + '"/><g class="pins"></g></svg></div>' +
-      '<div class="map-detail"><p class="hint">Click a pin or pick a country to see its copies.</p></div>';
+      '<div class="map-detail"></div>';
 
     var svg = root.querySelector("svg"), pinsG = root.querySelector(".pins");
     var detail = root.querySelector(".map-detail"), select = root.querySelector("select");
@@ -161,7 +159,7 @@
       if (current) showCountry(current);
       else {
         pins.forEach(function (p) { p.g.classList.remove("active"); });
-        detail.innerHTML = '<p class="hint">Click a pin or pick a country to see its copies.</p>';
+        detail.innerHTML = "";
       }
     });
     window.addEventListener("resize", function () { cur = viewFor(current); draw(cur); });

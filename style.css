@@ -425,7 +425,7 @@ dialog.panel .close:hover { color: var(--text); }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.map-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 24px 0 10px; }
+.map-bar { display: flex; justify-content: flex-start; align-items: center; gap: 12px; flex-wrap: wrap; margin: 24px 0 10px; }
 .map-bar .count { margin: 0; }
 .map-select select {
   font: inherit; font-size: 0.9rem; color: var(--text);
@@ -450,7 +450,8 @@ svg.map .pin.active .halo { opacity: 0.35; }
 svg.map .pin text { fill: var(--text); font-weight: 600; paint-order: stroke; stroke: #0e2619; stroke-linejoin: round; }
 svg.map .pin .num { fill: #0e2619; stroke: none; font-weight: 700; pointer-events: none; }
 
-.map-detail { margin: 20px 0 8px; min-height: 40px; }
+.map-detail { margin: 20px 0 8px; }
+.map-detail:empty { margin: 0; }
 .map-detail h3 { margin: 0 0 2px; }
 .map-detail .muted { margin: 0 0 8px; }
 .map-detail .hint { color: var(--muted); font-style: italic; font-size: 0.95rem; }
