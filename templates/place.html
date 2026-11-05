@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  PLACE TEMPLATE: copy this file to add a place to Travel.
+  1. Copy it into the travel folder and rename it, e.g. travel/lisbon.html
+     (lowercase, dashes, no spaces).
+  2. Replace "Place name" in the <title>, the breadcrumb and the <h1>.
+  3. Fill in the sections. Delete any you don't need.
+  4. Add a link to it on travel/index.html.
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Place name · Alec Liu</title>
+  <meta name="theme-color" content="#12301f">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main>
+    <nav class="crumbs"><a href="../index.html">Alec Liu</a><span class="sep">/</span><a href="index.html">Travel</a><span class="sep">/</span>Place name</nav>
+
+    <h1>Place name</h1>
+
+    <!-- A few lines about the place: why you love it, when you went. -->
+    <p class="intro">A few lines about this place.</p>
+
+    <!-- ===== BOOKSTORES =====
+         Copy a whole <li>…</li> block for each spot. Delete any section you don't need. -->
+    <h2>Bookstores</h2>
+    <ul class="spots">
+      <li>
+        <span class="name">Name of the bookstore</span><span class="where">Neighbourhood</span>
+        <p>What makes it special, and what you'd tell a friend to look for.</p>
+        <p><a href="https://maps.google.com/?q=Bookstore+name+City" target="_blank" rel="noopener">Map</a></p>
+      </li>
+    </ul>
+
+    <!-- ===== CAFÉS ===== -->
+    <h2>Cafés</h2>
+    <ul class="spots">
+      <li>
+        <span class="name">Name of the café</span><span class="where">Neighbourhood</span>
+        <p>What to order, and the best time to go.</p>
+        <!-- Optional photo: put the file in /images, then: -->
+        <img src="../images/example-photo.svg" alt="Describe the photo">
+      </li>
+    </ul>
+
+    <!-- ===== ALSO WORTH IT ===== (walks, museums, restaurants, anything else) -->
+    <h2>Also worth it</h2>
+    <ul class="spots">
+      <li>
+        <span class="name">A favourite place</span><span class="where">Neighbourhood</span>
+        <p>One or two lines about it.</p>
+      </li>
+    </ul>
+
+    <footer>© 2026 Alec Liu</footer>
+  </main>
+</body>
+</html>

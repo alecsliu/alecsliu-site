@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal library · Alec Liu</title>
+  <meta name="theme-color" content="#12301f">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main>
+    <nav class="crumbs"><a href="../index.html">Alec Liu</a><span class="sep">/</span>Personal library</nav>
+
+    <h1>Personal library</h1>
+
+    <!-- ===== YOUR BLURB: write about how you approach your library. Add more <p>…</p> for more paragraphs. ===== -->
+    <p class="intro">[Write a paragraph here about how you approach your library.]</p>
+    <!-- ===== END OF BLURB ===== -->
+
+    <h2>The catalogue</h2>
+    <p class="count" id="count"></p>
+    <input class="search" id="q" type="search" placeholder="Search by title or author" aria-label="Search the library" hidden>
+    <div id="books"><p class="status">Loading the catalogue from LibraryThing…</p></div>
+
+    <script src="../js/librarything.js"></script>
+    <script>
+      (function () {
+        var box = document.getElementById("books"), q = document.getElementById("q"), all = [];
+
+        function render(list) {
+          if (!list.length) { box.innerHTML = '<p class="status">No matches.</p>'; return; }
+          box.innerHTML = '<ul class="books">' + list.map(function (b) {
+            return '<li><span class="book"><a href="' + escapeHTML(b.link) + '" target="_blank" rel="noopener">' + escapeHTML(b.title) +
+                   '</a><span class="by">' + escapeHTML(b.author) + '</span></span></li>';
+          }).join("") + "</ul>";
+        }
+
+        loadLibraryThing(function (books) {
+          all = books.sort(function (a, b) { return a.authorSort.localeCompare(b.authorSort) || a.title.localeCompare(b.title); });
+          document.getElementById("count").textContent = all.length + " books";
+          q.hidden = false;
+          render(all);
+        }, function (why) {
+          box.innerHTML = why === "not-configured"
+            ? '<p class="status">LibraryThing isn\'t connected yet.</p>'
+            : '<p class="status">Couldn\'t load the catalogue right now. Try again later.</p>';
+        });
+
+        q.addEventListener("input", function () {
+          var s = q.value.trim().toLowerCase();
+          render(!s ? all : all.filter(function (b) { return (b.title + " " + b.author).toLowerCase().indexOf(s) !== -1; }));
+        });
+      })();
+    </script>
+
+    <footer>© 2026 Alec Liu</footer>
+  </main>
+</body>
+</html>

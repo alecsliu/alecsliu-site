@@ -168,3 +168,115 @@ footer {
   main { padding: 48px 20px 48px; }
   h1 { font-size: 1.75rem; }
 }
+
+/* ---------- Space for your own writing at the top of a page ---------- */
+
+.intro { margin: 0 0 8px; }
+
+/* ---------- Loading / empty messages ---------- */
+
+.status {
+  color: var(--muted);
+  font-style: italic;
+  padding: 14px 0;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
+}
+
+/* ---------- Reading: list of finished books ---------- */
+
+.books {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.books li {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+}
+.books li:last-child { border-bottom: 1px solid var(--rule); }
+.books .book { flex: 1; min-width: 0; }
+.books .book a { color: var(--text); border-bottom: none; font-weight: 600; }
+.books .book a:hover { color: var(--accent); }
+.books .by { display: block; color: var(--muted); font-size: 0.92rem; }
+.books .when {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Search box ---------- */
+
+.search {
+  width: 100%;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg-raised);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+}
+.search::placeholder { color: var(--muted); }
+.search:focus { outline: none; border-color: var(--accent); }
+
+/* ---------- Cover grid (Le Petit Prince) ---------- */
+
+.covers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 22px 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.covers a { border-bottom: none; color: var(--text); display: block; }
+.covers .art {
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  transition: transform 0.15s;
+}
+.covers a:hover .art { transform: translateY(-3px); }
+.covers img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+}
+.covers .art span { padding: 10px; font-size: 0.85rem; color: var(--muted); }
+.covers .cap {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+.covers .cap small { display: block; color: var(--muted); font-size: 0.8rem; }
+
+/* ---------- Travel: a place page ---------- */
+
+.spots { list-style: none; margin: 0; padding: 0; }
+.spots li { padding: 14px 0; border-top: 1px solid var(--rule); }
+.spots li:last-child { border-bottom: 1px solid var(--rule); }
+.spots .name { font-weight: 600; }
+.spots .where { color: var(--muted); font-size: 0.9rem; margin-left: 6px; }
+.spots p { margin: 4px 0 0; }
+.spots img { margin: 12px 0 0; }

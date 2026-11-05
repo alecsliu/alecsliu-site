@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Petit Prince · Alec Liu</title>
+  <meta name="theme-color" content="#12301f">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main>
+    <nav class="crumbs"><a href="../index.html">Alec Liu</a><span class="sep">/</span>Le Petit Prince</nav>
+
+    <h1>Le Petit Prince</h1>
+
+    <!-- ===== YOUR TEXT: a few words about the collection. Delete if you don't want any. ===== -->
+    <p class="intro">[Write a few lines about your Le Petit Prince collection.]</p>
+    <!-- ===== END ===== -->
+
+    <p class="count" id="count"></p>
+    <div id="books"><p class="status">Loading the collection from LibraryThing…</p></div>
+
+    <script src="../js/librarything.js"></script>
+    <script>
+      (function () {
+        var box = document.getElementById("books");
+        loadLibraryThing(function (books) {
+          var list = books.filter(function (b) { return inCollection(b, LT_PETIT_PRINCE_COLLECTION); });
+          if (!list.length) { box.innerHTML = '<p class="status">No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.</p>'; return; }
+          document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions");
+          box.innerHTML = '<ul class="covers">' + list.map(function (b) {
+            var art = b.cover ? '<img src="' + escapeHTML(b.cover) + '" alt="" loading="lazy">' : '<span>' + escapeHTML(b.title) + '</span>';
+            var meta = [b.language, b.date].filter(Boolean).join(" · ");
+            return '<li><a href="' + escapeHTML(b.link) + '" target="_blank" rel="noopener"><span class="art">' + art +
+                   '</span><span class="cap">' + escapeHTML(b.title) + (meta ? "<small>" + escapeHTML(meta) + "</small>" : "") + "</span></a></li>";
+          }).join("") + "</ul>";
+        }, function (why) {
+          box.innerHTML = why === "not-configured"
+            ? '<p class="status">LibraryThing isn\'t connected yet.</p>'
+            : '<p class="status">Couldn\'t load the collection right now. Try again later.</p>';
+        });
+      })();
+    </script>
+
+    <footer>© 2026 Alec Liu</footer>
+  </main>
+</body>
+</html>
