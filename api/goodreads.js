@@ -10,7 +10,7 @@
 //   goodreads.com/user/show/12345678-alec  →  "12345678"
 // ============================================================
 
-const GOODREADS_USER_ID = process.env.GOODREADS_USER_ID || "YOUR_GOODREADS_ID";
+const GOODREADS_USER_ID = process.env.GOODREADS_USER_ID || "160897919";
 const SHELF = "read";
 const MAX_PAGES = 10; // the feed gives ~100 books per page
 

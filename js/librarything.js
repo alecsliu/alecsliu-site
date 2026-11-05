@@ -9,11 +9,11 @@
 // catalogue needs to be public.
 // ============================================================
 
-var LT_USER = "YOUR_LIBRARYTHING_USERNAME";
+var LT_USER = "seansal";
 
 // Name of the LibraryThing collection that holds your
 // Le Petit Prince books (exactly as it appears on LibraryThing).
-var LT_PETIT_PRINCE_COLLECTION = "Le Petit Prince";
+var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
 
 // ------------------------------------------------------------
 
