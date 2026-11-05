@@ -32,17 +32,20 @@
     var countryList = Object.keys(countries).sort();
 
     root.innerHTML =
-      '<div class="map-bar">' +
-        '<label class="map-select"><span class="sr-only">Show country</span><select>' +
-          '<option value="">All countries</option>' +
-          countryList.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("") +
-        "</select></label></div>" +
+      '<div class="map-bar"><div class="dd">' +
+        '<button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false">' +
+          '<span class="dd-val">All countries</span><span class="dd-chev" aria-hidden="true"></span></button>' +
+        '<div class="dd-panel" hidden>' +
+          '<input type="search" class="dd-search" placeholder="Search countries" aria-label="Search countries" autocomplete="off">' +
+          '<ul class="dd-list" role="listbox"></ul>' +
+          '<p class="dd-empty" hidden>No matches</p>' +
+        "</div></div></div>" +
       '<div class="map-wrap"><svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of where each copy was bought">' +
         '<path class="land" d="' + M.land + '"/><path class="borders" d="' + M.borders + '"/><g class="pins"></g></svg></div>' +
       '<div class="map-detail"></div>';
 
     var svg = root.querySelector("svg"), pinsG = root.querySelector(".pins");
-    var detail = root.querySelector(".map-detail"), select = root.querySelector("select");
+    var detail = root.querySelector(".map-detail");
 
     var pins = cityKeys.map(function (k) {
       var info = CITIES[k], pt = project(info.lon, info.lat), n = byCity[k].length;
@@ -153,15 +156,60 @@
       requestAnimationFrame(step);
     }
 
-    select.addEventListener("change", function () {
-      current = select.value;
+    function choose(value) {
+      current = value;
       animateTo(viewFor(current));
       if (current) showCountry(current);
       else {
         pins.forEach(function (p) { p.g.classList.remove("active"); });
         detail.innerHTML = "";
       }
+    }
+
+    // ---- custom dropdown with search ----
+    var dd = root.querySelector(".dd"), btn = dd.querySelector(".dd-btn"), panel = dd.querySelector(".dd-panel");
+    var search = dd.querySelector(".dd-search"), ul = dd.querySelector(".dd-list"), none = dd.querySelector(".dd-empty");
+    var counts = {}; placed.forEach(function (c) { var k = CITIES[c.cityKey].country; counts[k] = (counts[k] || 0) + 1; });
+    var options = [{ v: "", label: "All countries", n: placed.length }].concat(
+      countryList.map(function (c) { return { v: c, label: c, n: counts[c] }; }));
+    var activeIdx = 0, visible = options;
+
+    function renderOptions() {
+      var t = search.value.trim().toLowerCase();
+      visible = options.filter(function (o) { return !t || o.label.toLowerCase().indexOf(t) !== -1; });
+      ul.innerHTML = visible.map(function (o, i) {
+        return '<li role="option" data-i="' + i + '" aria-selected="' + (o.v === current) + '"' + (i === activeIdx ? ' class="active"' : "") + ">" +
+          '<span>' + esc(o.label) + '</span><span class="dd-n">' + o.n + "</span></li>";
+      }).join("");
+      none.hidden = visible.length > 0;
+    }
+    function open() {
+      panel.hidden = false; btn.setAttribute("aria-expanded", "true"); dd.classList.add("open");
+      search.value = ""; activeIdx = Math.max(0, options.findIndex(function (o) { return o.v === current; }));
+      renderOptions(); search.focus();
+    }
+    function close(focusBtn) {
+      panel.hidden = true; btn.setAttribute("aria-expanded", "false"); dd.classList.remove("open");
+      if (focusBtn) btn.focus();
+    }
+    function pick(o) {
+      dd.querySelector(".dd-val").textContent = o.label;
+      close(true); choose(o.v);
+    }
+    btn.addEventListener("click", function () { panel.hidden ? open() : close(); });
+    search.addEventListener("input", function () { activeIdx = 0; renderOptions(); });
+    search.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); activeIdx = Math.min(visible.length - 1, activeIdx + 1); renderOptions(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); activeIdx = Math.max(0, activeIdx - 1); renderOptions(); }
+      else if (e.key === "Enter") { e.preventDefault(); if (visible[activeIdx]) pick(visible[activeIdx]); }
+      else if (e.key === "Escape") { close(true); }
     });
+    ul.addEventListener("mousedown", function (e) { e.preventDefault(); }); // keep focus in the search box
+    ul.addEventListener("click", function (e) {
+      var li = e.target.closest("li"); if (li) pick(visible[+li.getAttribute("data-i")]);
+    });
+    document.addEventListener("click", function (e) { if (!dd.contains(e.target) && !panel.hidden) close(); });
+
     window.addEventListener("resize", function () { cur = viewFor(current); draw(cur); });
     draw(cur);
   };
