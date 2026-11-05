@@ -506,3 +506,4 @@ footer .updated { margin: 0 0 4px; }
 .map-zoom button.reset { font-size: 0.95rem; }
 
 .reads .when { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.spots a.name.internal::after { content: " →"; }
