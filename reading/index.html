@@ -34,12 +34,15 @@
 
     <h1>Reading</h1>
 
-    <p class="intro">
-      The Hardcover feed below shows my 10 most recent books.
-      <!-- "Currently reading" fills in automatically from Hardcover. The text below only shows if Hardcover can't be reached. -->
-      <span id="current">Currently, I'm reading <em>Puertas demasiado pequeñas</em> by Ave Barrera and
-      <em>One Day in the Life of Ivan Denisovich</em> by Alexander Solzhenitsyn.</span>
-    </p>
+    <p class="intro">The Hardcover feed below shows what I'm reading now and my 10 most recent books.</p>
+
+    <!-- Both sections fill in automatically from Hardcover. -->
+    <section id="current-section" hidden>
+      <h2>Currently reading</h2>
+      <div id="current"></div>
+    </section>
+
+    <h2>Recently finished</h2>
 
     <div id="books"><p class="status">Loading books…</p></div>
 
@@ -62,23 +65,7 @@
         }
         var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         function fmtDate(d) { var p = String(d).slice(0, 10).split("-"); return p.length === 3 ? MONTHS[+p[1] - 1] + " " + (+p[2]) + ", " + p[0] : esc(d); }
-        function fail() { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; }
-
-        fetch("../api/reading")
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.error || !data.books || !data.books.length) return fail();
-            if (Array.isArray(data.reading)) {
-              var cur = document.getElementById("current");
-              var items = data.reading.map(function (b) { return "<em>" + esc(b.title) + "</em>" + (b.author ? " by " + esc(b.author) : ""); });
-              if (!items.length) cur.textContent = "";
-              else {
-                var list = items.length === 1 ? items[0]
-                  : items.slice(0, -1).join(", ") + (items.length > 2 ? "," : "") + " and " + items[items.length - 1];
-                cur.innerHTML = "Currently, I'm reading " + list + ".";
-              }
-            }
-            box.innerHTML = '<ul class="reads">' + data.books.map(function (b) {
+        function row(b) {
               var art = b.cover ? '<img src="' + esc(b.cover) + '" alt="" loading="lazy">' : "";
               var note = noteFor(b.title);
               return '<li><a class="cover" href="' + esc(b.link) + '" target="_blank" rel="noopener">' + art + '</a>' +
@@ -86,7 +73,18 @@
                      (b.author ? '<span class="by">' + esc(b.author) + '</span>' : '') +
                      (b.finished ? '<span class="when">Finished ' + fmtDate(b.finished) + '</span>' : '') + '</div>' +
                      '<div class="comment">' + note + '</div></li>';
-            }).join("") + "</ul>";
+            }
+        function fail() { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; }
+
+        fetch("../api/reading")
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.error || !data.books || !data.books.length) return fail();
+            if (Array.isArray(data.reading) && data.reading.length) {
+              document.getElementById("current").innerHTML = '<ul class="reads">' + data.reading.map(row).join("") + "</ul>";
+              document.getElementById("current-section").hidden = false;
+            }
+            box.innerHTML = '<ul class="reads">' + data.books.map(row).join("") + "</ul>";
           })
           .catch(fail);
       })();
