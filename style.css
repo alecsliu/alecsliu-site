@@ -417,3 +417,6 @@ dialog.panel .close:hover { color: var(--text); }
 }
 .icon-goodreads { --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@13/icons/goodreads.svg"); }
 .icon-substack  { --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@13/icons/substack.svg"); }
+.spots a.name { color: var(--text); border-bottom: 1px solid rgba(183, 228, 199, 0.35); }
+.spots a.name:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.spots a.name::after { content: " ↗"; color: var(--accent); font-size: 0.85em; }
