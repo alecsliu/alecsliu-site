@@ -2,89 +2,100 @@
 // Goodreads → JSON, for the Reading page.
 //
 // Vercel runs this file on its servers at  /api/goodreads
-// It reads your public Goodreads "read" shelf (an RSS feed),
-// and hands the Reading page a tidy list of books.
 //
-// The only thing you'd ever change is the ID below.
-// Find it in your Goodreads profile URL:
-//   goodreads.com/user/show/12345678-alec  →  "12345678"
+// Goodreads shut down its shelf RSS feeds in October 2026, so this
+// reads Goodreads' public "bookshelf widget" instead (the thing
+// Goodreads offers for embedding on blogs) and turns it into a list.
+// The widget doesn't include the date you finished a book, but it is
+// sorted by it.
+//
+// Settings you might change:
 // ============================================================
 
 const GOODREADS_USER_ID = process.env.GOODREADS_USER_ID || "160897919";
 const SHELF = "read";
-const MAX_PAGES = 10; // the feed gives ~100 books per page
+const NUM_BOOKS = 5; // how many books to show
 
-function pick(xml, tag) {
-  const m = xml.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`));
-  if (!m) return "";
-  return m[1]
-    .replace(/^<!\[CDATA\[/, "")
-    .replace(/\]\]>$/, "")
-    .replace(/&amp;/g, "&")
+// ------------------------------------------------------------
+
+function decodeEntities(s) {
+  return s
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+    .replace(/&#39;|&apos;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .trim();
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&");
 }
 
-function toISO(s) {
-  if (!s) return null;
-  const d = new Date(s);
-  return isNaN(d) ? null : d.toISOString();
+function text(html) {
+  return decodeEntities(String(html || "").replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim();
+}
+
+// The widget is JavaScript that writes HTML; undo the JS string escaping.
+function unescapeJS(s) {
+  return s
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/\\x([0-9a-fA-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, " ")
+    .replace(/\\(["'\/\\])/g, "$1");
+}
+
+function fullSizeCover(src) {
+  if (!src || /nophoto|no_cover|nocover/i.test(src)) return "";
+  return src.replace(/\._[A-Z]{2}\d+_(?=\.)/, ""); // drop Goodreads' "._SX98_" size suffix
+}
+
+function parseWidget(raw) {
+  const html = unescapeJS(raw);
+  const blocks = html.split(/<div[^>]+class=["'][^"']*gr_custom_each_container[^"']*["'][^>]*>/i).slice(1);
+  return blocks.map((b) => {
+    const titleDiv = b.match(/class=["'][^"']*gr_custom_title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    const authorDiv = b.match(/class=["'][^"']*gr_custom_author[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    const img = b.match(/<img[^>]*\ssrc=["']([^"']+)["'][^>]*>/i);
+    const imgAlt = b.match(/<img[^>]*\salt=["']([^"']*)["']/i);
+    const href = (titleDiv && titleDiv[1].match(/href=["']([^"']+)["']/i)) || b.match(/href=["']([^"']+)["']/i);
+    let author = authorDiv ? text(authorDiv[1]).replace(/^by\s+/i, "") : "";
+    return {
+      title: titleDiv ? text(titleDiv[1]) : text(imgAlt && imgAlt[1]),
+      author,
+      cover: fullSizeCover(img && img[1]),
+      link: href ? decodeEntities(href[1]).replace(/^\/\//, "https://").replace(/^\//, "https://www.goodreads.com/") : "",
+    };
+  }).filter((b) => b.title);
 }
 
 module.exports = async function handler(req, res) {
-  if (!/^\d+$/.test(GOODREADS_USER_ID)) {
-    res.status(200).json({ configured: false, books: [] });
-    return;
-  }
-
-  const seen = new Set();
-  const books = [];
+  const params = new URLSearchParams({
+    shelf: SHELF,
+    sort: "date_read",
+    order: "d",
+    num_books: String(NUM_BOOKS),
+    show_author: "1",
+    show_cover: "1",
+    show_title: "1",
+    show_rating: "0",
+    show_review: "0",
+    show_tags: "0",
+    cover_size: "large",
+    cover_position: "left",
+    widget_id: "alecsliu",
+  });
+  const url = `https://www.goodreads.com/review/custom_widget/${GOODREADS_USER_ID}.Read?${params}`;
 
   try {
-    for (let page = 1; page <= MAX_PAGES; page++) {
-      const url = `https://www.goodreads.com/review/list_rss/${GOODREADS_USER_ID}?shelf=${SHELF}&page=${page}`;
-      const r = await fetch(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; alecsliu.com reading page)",
-          "Accept": "application/rss+xml, application/xml, text/xml, */*",
-        },
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!r.ok) {
-        if (page === 1) throw new Error(`Goodreads responded with status ${r.status}`);
-        break;
-      }
-      const xml = await r.text();
-      const items = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
-      if (page === 1 && items.length === 0 && !/<rss/i.test(xml)) {
-        throw new Error("Goodreads didn't return a feed (the shelf may be private): " + xml.slice(0, 120));
-      }
-      let added = 0;
-      for (const item of items) {
-        const id = pick(item, "book_id") || pick(item, "guid");
-        if (seen.has(id)) continue;
-        seen.add(id);
-        added++;
-        books.push({
-          title: pick(item, "title"),
-          author: pick(item, "author_name"),
-          finished: toISO(pick(item, "user_read_at")),
-          added: toISO(pick(item, "user_date_added")),
-          rating: Number(pick(item, "user_rating")) || 0,
-          cover: pick(item, "book_large_image_url") || pick(item, "book_image_url"),
-          link: id ? `https://www.goodreads.com/book/show/${id}` : pick(item, "link"),
-        });
-      }
-      if (added === 0) break; // no new books → reached the end
-    }
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; alecsliu.com reading page)" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) throw new Error(`Goodreads responded with status ${r.status}`);
+    const raw = await r.text();
+    const books = parseWidget(raw).slice(0, NUM_BOOKS);
+    if (!books.length) throw new Error("Couldn't find any books in the Goodreads widget. Start of response: " + raw.slice(0, 300));
 
-    // Newest finished first; books without a finish date go last.
-    books.sort((a, b) => (b.finished || "").localeCompare(a.finished || ""));
-
-    // Cache on Vercel for an hour so Goodreads isn't hit on every visit.
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
     res.status(200).json({ configured: true, books });
   } catch (err) {

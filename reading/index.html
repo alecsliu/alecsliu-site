@@ -21,41 +21,26 @@
     <p class="intro">Your text here.</p>
     -->
 
-    <p class="count" id="count"></p>
+    <h2>Recently finished</h2>
     <div id="books"><p class="status">Loading books from Goodreads…</p></div>
 
     <script>
       (function () {
         var box = document.getElementById("books");
-        var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+        function fail() { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; }
 
         fetch("../api/goodreads")
           .then(function (r) { return r.json(); })
           .then(function (data) {
-            if (!data.configured) { box.innerHTML = '<p class="status">Goodreads isn\'t connected yet.</p>'; return; }
-            if (data.error || !data.books.length) { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; return; }
-
-            document.getElementById("count").textContent = data.books.length + " books";
-
-            // Group by year finished
-            var groups = {}, order = [];
-            data.books.forEach(function (b) {
-              var y = b.finished ? new Date(b.finished).getUTCFullYear() : "Undated";
-              if (!groups[y]) { groups[y] = []; order.push(y); }
-              groups[y].push(b);
-            });
-
-            box.innerHTML = order.map(function (y) {
-              return "<h2>" + y + "</h2><ul class=\"books\">" + groups[y].map(function (b) {
-                var d = b.finished ? new Date(b.finished) : null;
-                var when = d ? months[d.getUTCMonth()] + " " + d.getUTCDate() : "";
-                return "<li><span class=\"book\"><a href=\"" + esc(b.link) + "\" target=\"_blank\" rel=\"noopener\">" + esc(b.title) +
-                       "</a><span class=\"by\">" + esc(b.author) + "</span></span><span class=\"when\">" + when + "</span></li>";
-              }).join("") + "</ul>";
-            }).join("");
+            if (data.error || !data.books || !data.books.length) return fail();
+            box.innerHTML = '<ul class="covers">' + data.books.map(function (b) {
+              var art = b.cover ? '<img src="' + esc(b.cover) + '" alt="" loading="lazy">' : "<span>" + esc(b.title) + "</span>";
+              return '<li><a href="' + esc(b.link) + '" target="_blank" rel="noopener"><span class="art">' + art +
+                     '</span><span class="cap">' + esc(b.title) + (b.author ? "<small>" + esc(b.author) + "</small>" : "") + "</span></a></li>";
+            }).join("") + "</ul>";
           })
-          .catch(function () { box.innerHTML = '<p class="status">Couldn\'t load books right now. Try again later.</p>'; });
+          .catch(fail);
       })();
     </script>
 
