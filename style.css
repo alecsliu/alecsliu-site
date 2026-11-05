@@ -491,3 +491,6 @@ svg.map .pin .num { fill: #0e2619; stroke: none; font-weight: 700; pointer-event
 .map-detail .t { display: block; font-weight: 600; line-height: 1.4; }
 .map-detail .m { display: block; color: var(--muted); font-size: 0.9rem; }
 input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+/* "Updated <Month Year>" line in the footer (filled in automatically) */
+footer .updated { margin: 0 0 4px; }
