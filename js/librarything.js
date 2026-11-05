@@ -127,6 +127,9 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
     dialog.showModal();
   }
 
+  window.findBookNote = findNote;
+  window.languageName = langName;
+
   window.renderCovers = function (el, books, opts) {
     opts = opts || {};
     if (opts.languages) {

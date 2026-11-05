@@ -41,19 +41,64 @@
     </p>
     <!-- ===== END ===== -->
 
+    <!-- MAP: built from the notes and cities in notes.js -->
+    <section id="map"></section>
+
+    <h2>All editions</h2>
     <p class="count" id="count"></p>
+    <input class="search" id="q" type="search" placeholder="Search by title, language, bookstore or city" aria-label="Search the collection" hidden>
     <div id="books"><p class="status">Loading the collection from LibraryThing…</p></div>
 
     <script src="../js/librarything.js"></script>
     <script src="../le-petit-prince/notes.js"></script>
+    <script src="../le-petit-prince/map-data.js"></script>
+    <script src="../le-petit-prince/map.js"></script>
     <script>
       (function () {
-        var box = document.getElementById("books");
+        var box = document.getElementById("books"), q = document.getElementById("q");
+        var NOTES = window.PETIT_PRINCE_NOTES || {}, LANGS = window.PETIT_PRINCE_LANGUAGES || {}, CITIES = window.PETIT_PRINCE_CITIES || {};
+
+        // "Bookstore. City. Month Year" → parts
+        function parseNote(note) {
+          var plain = String(note || "").replace(/<[^>]*>/g, "");
+          var parts = plain.split(/\.\s+|\.$/).map(function (x) { return x.trim(); }).filter(Boolean);
+          var cityKey = "";
+          parts.forEach(function (p) { if (!cityKey && CITIES[p]) cityKey = p; });
+          return { store: parts[0] || "", cityKey: cityKey, date: cityKey ? parts[parts.indexOf(cityKey) + 1] || "" : "" };
+        }
+
         loadLibraryThing(function (books) {
           var list = books.filter(function (b) { return inCollection(b, LT_PETIT_PRINCE_COLLECTION); });
-          if (list.length) document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions") + " · click a cover for notes";
-          renderCovers(box, list, { notes: window.PETIT_PRINCE_NOTES || {}, languages: window.PETIT_PRINCE_LANGUAGES || {}, empty: 'No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.' });
+          list.forEach(function (b) { var l = findBookNote(b, LANGS); if (l) b.language = l; });
+
+          var copies = list.map(function (b) {
+            var note = findBookNote(b, NOTES), p = parseNote(note);
+            return { book: b, note: note, store: p.store, date: p.date, cityKey: p.cityKey };
+          });
+          renderPetitPrinceMap(document.getElementById("map"), copies);
+
+          function haystack(c) {
+            var city = CITIES[c.cityKey] || {};
+            return [c.book.title, c.book.language && languageName(c.book.language), c.book.date, c.store, city.name, city.country]
+              .join(" ").toLowerCase();
+          }
+          function show(subset) {
+            renderCovers(box, subset.map(function (c) { return c.book; }), { notes: NOTES, empty: "No matches." });
+          }
+
+          if (!list.length) {
+            box.innerHTML = '<p class="status">No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.</p>';
+            return;
+          }
+          document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions") + " · click a cover for notes";
+          q.hidden = false;
+          show(copies);
+          q.addEventListener("input", function () {
+            var t = q.value.trim().toLowerCase();
+            show(!t ? copies : copies.filter(function (c) { return haystack(c).indexOf(t) !== -1; }));
+          });
         }, function (why) {
+          document.getElementById("map").hidden = true;
           box.innerHTML = why === "not-configured"
             ? '<p class="status">LibraryThing isn\'t connected yet.</p>'
             : '<p class="status">Couldn\'t load the collection right now. Try again later.</p>';

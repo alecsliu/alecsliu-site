@@ -32,3 +32,23 @@ window.PETIT_PRINCE_NOTES = {
 window.PETIT_PRINCE_LANGUAGES = {
   "An Tsakam ts'alej": "Téenek",
 };
+
+// ------------------------------------------------------------
+// CITIES FOR THE MAP
+// The map reads the city from each note above (the part after the
+// first full stop: "Bookstore. CITY. Month Year").
+// Each city used in a note needs a line here:
+//   "As written in the note": { name: "Shown on the map", country: "Country", lat: …, lon: … },
+// To get lat/lon: right-click the spot in Google Maps; the first number
+// it shows is lat, the second is lon.
+// Country names must match the map's names (e.g. "United States of America",
+// "United Kingdom", "Netherlands", "Brazil", "Japan").
+// ------------------------------------------------------------
+window.PETIT_PRINCE_CITIES = {
+  "CDMX":      { name: "Mexico City", country: "Mexico",      lat: 19.4326, lon: -99.1332 },
+  "Barcelona": { name: "Barcelona",   country: "Spain",       lat: 41.3874, lon: 2.1686 },
+  "Rome":      { name: "Rome",        country: "Italy",       lat: 41.9028, lon: 12.4964 },
+  "Cannes":    { name: "Cannes",      country: "France",      lat: 43.5528, lon: 7.0174 },
+  "Paris":     { name: "Paris",       country: "France",      lat: 48.8566, lon: 2.3522 },
+  "Amsterdam": { name: "Amsterdam",   country: "Netherlands", lat: 52.3676, lon: 4.9041 },
+};
