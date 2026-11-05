@@ -41,10 +41,11 @@
           '<p class="dd-empty" hidden>No matches</p>' +
         "</div></div></div>" +
       '<div class="map-wrap"><svg class="map" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of where each copy was bought">' +
-        '<path class="land" d="' + M.land + '"/><path class="borders" d="' + M.borders + '"/><g class="pins"></g></svg></div>' +
+        '<path class="land" d="' + M.land + '"/><path class="borders" d="' + M.borders + '"/><g class="pins"></g></svg>' +
+        '<div class="map-zoom"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Reset map" class="reset">↺</button></div></div>' +
       '<div class="map-detail"></div>';
 
-    var svg = root.querySelector("svg"), pinsG = root.querySelector(".pins");
+    var svg = root.querySelector("svg"), pinsG = root.querySelector(".pins"), justDragged = false;
     var detail = root.querySelector(".map-detail");
 
     var pins = cityKeys.map(function (k) {
@@ -55,7 +56,7 @@
       g.innerHTML = '<circle class="halo"/><circle class="dot"/><text class="num" text-anchor="middle"></text><text class="label"></text>';
       g.querySelector(".num").textContent = n > 1 ? n : "";
       g.querySelector(".label").textContent = info.name;
-      g.addEventListener("click", function () { showCity(k); });
+      g.addEventListener("click", function () { if (!justDragged) showCity(k); });
       g.addEventListener("keydown", function (e) { if (e.key === "Enter") showCity(k); });
       pinsG.appendChild(g);
       return { key: k, g: g, pt: pt, n: n, name: info.name };
@@ -209,6 +210,68 @@
       var li = e.target.closest("li"); if (li) pick(visible[+li.getAttribute("data-i")]);
     });
     document.addEventListener("click", function (e) { if (!dd.contains(e.target) && !panel.hidden) close(); });
+
+    // ---- drag to move, pinch / ctrl+scroll / buttons to zoom ----
+    var MIN_W = 20, MAX_W = M.W * 1.15;
+    function clampView(vb) {
+      var w = Math.max(MIN_W, Math.min(MAX_W, vb[2])), h = w * vb[3] / vb[2];
+      var cx = Math.max(0, Math.min(M.W, vb[0] + vb[2] / 2)), cy = Math.max(0, Math.min(M.H, vb[1] + vb[3] / 2));
+      return [cx - w / 2, cy - h / 2, w, h];
+    }
+    function zoomAt(factor, px, py) { // px,py: point in map units that stays put
+      var w = cur[2] * factor, h = cur[3] * factor;
+      if (w < MIN_W || w > MAX_W) { var f2 = Math.max(MIN_W, Math.min(MAX_W, w)) / cur[2]; w = cur[2] * f2; h = cur[3] * f2; factor = f2; }
+      cur = clampView([px - (px - cur[0]) * factor, py - (py - cur[1]) * factor, w, h]);
+      draw(cur);
+    }
+    function toMap(clientX, clientY) {
+      var r = svg.getBoundingClientRect();
+      return [cur[0] + (clientX - r.left) / r.width * cur[2], cur[1] + (clientY - r.top) / r.height * cur[3]];
+    }
+    var pointers = {}, startDist = 0, moved = 0;
+    svg.addEventListener("pointerdown", function (e) {
+      pointers[e.pointerId] = [e.clientX, e.clientY]; moved = 0;
+      var ids = Object.keys(pointers);
+      if (ids.length === 2) { var a = pointers[ids[0]], b = pointers[ids[1]]; startDist = Math.hypot(a[0] - b[0], a[1] - b[1]); }
+    });
+    svg.addEventListener("pointermove", function (e) {
+      if (!pointers[e.pointerId]) return;
+      var prev = pointers[e.pointerId], ids = Object.keys(pointers);
+      pointers[e.pointerId] = [e.clientX, e.clientY];
+      var r = svg.getBoundingClientRect();
+      if (ids.length === 1) {
+        var dx = e.clientX - prev[0], dy = e.clientY - prev[1];
+        moved += Math.abs(dx) + Math.abs(dy);
+        if (moved > 4 && !svg.hasPointerCapture(e.pointerId)) { svg.setPointerCapture(e.pointerId); svg.classList.add("dragging"); }
+        cur = clampView([cur[0] - dx / r.width * cur[2], cur[1] - dy / r.height * cur[3], cur[2], cur[3]]);
+        draw(cur);
+      } else if (ids.length === 2) {
+        var a = pointers[ids[0]], b = pointers[ids[1]], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+        if (startDist) { var mid = toMap((a[0] + b[0]) / 2, (a[1] + b[1]) / 2); zoomAt(startDist / d, mid[0], mid[1]); }
+        startDist = d; moved += 10;
+      }
+    });
+    function endPointer(e) {
+      delete pointers[e.pointerId]; startDist = 0;
+      if (!Object.keys(pointers).length) {
+        svg.classList.remove("dragging");
+        justDragged = moved > 5; setTimeout(function () { justDragged = false; }, 0);
+      }
+    }
+    svg.addEventListener("pointerup", endPointer);
+    svg.addEventListener("pointercancel", endPointer);
+    // Trackpad pinch (and ctrl/cmd + scroll) zooms; plain scrolling still scrolls the page.
+    svg.addEventListener("wheel", function (e) {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      var p = toMap(e.clientX, e.clientY);
+      zoomAt(Math.exp(e.deltaY * 0.01), p[0], p[1]);
+    }, { passive: false });
+    root.querySelector(".map-zoom").addEventListener("click", function (e) {
+      var z = e.target.getAttribute("data-z"); if (!z) return;
+      if (z === "reset") { animateTo(viewFor(current)); return; }
+      zoomAt(z === "in" ? 0.6 : 1 / 0.6, cur[0] + cur[2] / 2, cur[1] + cur[3] / 2);
+    });
 
     window.addEventListener("resize", function () { cur = viewFor(current); draw(cur); });
     draw(cur);

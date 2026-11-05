@@ -466,8 +466,9 @@ dialog.panel .close:hover { color: var(--text); }
 .dd-n { color: var(--muted); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
 .dd-empty { color: var(--muted); font-size: 0.9rem; font-style: italic; padding: 6px 10px; margin: 0; }
 
-.map-wrap { background: #0e2619; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
-svg.map { display: block; width: 100%; height: max(320px, 52vw); max-height: 340px; touch-action: manipulation; }
+.map-wrap { position: relative; background: #0e2619; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+svg.map { display: block; width: 100%; height: max(320px, 52vw); max-height: 340px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+svg.map.dragging { cursor: grabbing; }
 svg.map .land { fill: #1f4a33; }
 svg.map .borders { fill: none; stroke: #12301f; stroke-linejoin: round; }
 svg.map .pin { cursor: pointer; outline: none; }
@@ -494,3 +495,12 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; a
 
 /* "Updated <Month Year>" line in the footer (filled in automatically) */
 footer .updated { margin: 0 0 4px; }
+
+.map-zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.map-zoom button {
+  width: 30px; height: 30px; display: grid; place-items: center;
+  font: inherit; font-size: 1.05rem; line-height: 1; color: var(--text);
+  background: rgba(24, 59, 39, 0.92); border: 1px solid var(--rule); border-radius: 8px; cursor: pointer;
+}
+.map-zoom button:hover { border-color: var(--accent); color: var(--accent); }
+.map-zoom button.reset { font-size: 0.95rem; }
