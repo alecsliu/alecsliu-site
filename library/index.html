@@ -37,7 +37,8 @@
         function show(list) { renderCovers(box, list, { showAuthor: true, empty: "No matches." }); }
 
         loadLibraryThing(function (books) {
-          all = books.sort(function (a, b) { return a.authorSort.localeCompare(b.authorSort) || a.title.localeCompare(b.title); });
+          // Most recently added to LibraryThing first
+          all = books.sort(function (a, b) { return (b.entered - a.entered) || a.title.localeCompare(b.title); });
           document.getElementById("count").textContent = all.length + " books";
           q.hidden = false;
           show(all);

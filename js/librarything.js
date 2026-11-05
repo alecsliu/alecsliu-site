@@ -35,6 +35,7 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
       authorSort: (book.author_lf || book.author_fl || "").toLowerCase(),
       cover: book.cover && !/nocover|nopic/i.test(book.cover) ? book.cover.replace(/^http:/, "https:") : "",
       date: book.publicationdate || book.date || "",
+      entered: Number(book.entry_stamp) || Date.parse(book.entry_date || "") / 1000 || 0,
       language: book.language_main || book.language || "",
       link: "https://www.librarything.com/work/book/" + book.book_id,
       collections: collectionNames(book),
@@ -94,7 +95,9 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
     return "";
   }
 
+  var LANG_LABELS = { fry: "Frisian", fy: "Frisian" };
   function langName(code) {
+    if (LANG_LABELS[code]) return LANG_LABELS[code];
     try {
       var n = new Intl.DisplayNames(["en"], { type: "language" }).of(code);
       return n && n !== code ? n : code;
@@ -125,6 +128,9 @@ var LT_PETIT_PRINCE_COLLECTION = "The Little Prince";
 
   window.renderCovers = function (el, books, opts) {
     opts = opts || {};
+    if (opts.languages) {
+      books.forEach(function (b) { var l = findNote(b, opts.languages); if (l) b.language = l; });
+    }
     if (!books.length) { el.innerHTML = '<p class="status">' + (opts.empty || "Nothing here.") + "</p>"; return; }
     el.innerHTML = '<ul class="covers">' + books.map(function (b, i) {
       var art = b.cover ? '<img src="' + escapeHTML(b.cover) + '" alt="" loading="lazy">' : "<span>" + escapeHTML(b.title) + "</span>";

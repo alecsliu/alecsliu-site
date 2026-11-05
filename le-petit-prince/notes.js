@@ -15,12 +15,20 @@
 // ============================================================
 
 window.PETIT_PRINCE_NOTES = {
-  "El petit princep": ``,
-  "Il piccolo principe": ``,
-  "Er principetto": ``,
-  "Le Petit Prince (Collection Folio": ``,
-  "Édition collector 80 ans": ``,
-  "'t Klein prinske": ``,
-  "An Tsakam ts'alej": ``,
-  "De lytse prins": ``,
+  "El petit princep": `La Central del Raval. Barcelona. October 2026`,
+  "Il piccolo principe": `Libreria Panisperna 220. Rome. October 2026`,
+  "Er principetto": `Feltrinelli. Rome. October 2026`,
+  "Le Petit Prince (Collection Folio": `FNAC. Cannes. October 2026`,
+  "Édition collector 80 ans": `Shakespeare and Company. Paris. October 2026`,
+  "'t Klein prinske": `Athenaeum Boekhandel. Amsterdam. October 2026`,
+  "An Tsakam ts'alej": `UNAM Bookstore. CDMX. August 2026`,
+  "De lytse prins": `Athenaeum Boekhandel. Amsterdam. October 2026`,
+};
+
+// ------------------------------------------------------------
+// LANGUAGE LABELS: use these to correct the language shown
+// for a book (same title-matching as above).
+// ------------------------------------------------------------
+window.PETIT_PRINCE_LANGUAGES = {
+  "An Tsakam ts'alej": "Téenek",
 };

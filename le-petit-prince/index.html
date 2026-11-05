@@ -20,7 +20,7 @@
     <!-- ===== YOUR TEXT: a few words about the collection. Delete if you don't want any. ===== -->
     <p class="intro">
       Outside of the Bible, <em>Le Petit Prince</em> is the most translated book in the world. After finding a copy
-      of the book at an UNAM bookstore in Téenek, I became interested in collecting copies during my travels.
+      of the book in Téenek at an UNAM bookstore, I became interested in collecting copies during my travels.
     </p>
     <!-- ===== END ===== -->
 
@@ -35,7 +35,7 @@
         loadLibraryThing(function (books) {
           var list = books.filter(function (b) { return inCollection(b, LT_PETIT_PRINCE_COLLECTION); });
           if (list.length) document.getElementById("count").textContent = list.length + (list.length === 1 ? " edition" : " editions") + " · click a cover for notes";
-          renderCovers(box, list, { notes: window.PETIT_PRINCE_NOTES || {}, empty: 'No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.' });
+          renderCovers(box, list, { notes: window.PETIT_PRINCE_NOTES || {}, languages: window.PETIT_PRINCE_LANGUAGES || {}, empty: 'No books found in the "' + escapeHTML(LT_PETIT_PRINCE_COLLECTION) + '" collection.' });
         }, function (why) {
           box.innerHTML = why === "not-configured"
             ? '<p class="status">LibraryThing isn\'t connected yet.</p>'
