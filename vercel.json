@@ -3,8 +3,19 @@
   "redirects": [
     {
       "source": "/color",
-      "destination": "https://color-guess.alecsliu.com",
+      "destination": "/project/color-guess",
       "permanent": false
+    },
+    {
+      "source": "/projects/color-guess",
+      "destination": "/project/color-guess",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/project/color-guess/:path*",
+      "destination": "https://color-guess.vercel.app/project/color-guess/:path*"
     }
   ],
   "headers": [
