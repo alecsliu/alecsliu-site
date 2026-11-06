@@ -15,7 +15,7 @@
   "rewrites": [
     {
       "source": "/project/color-guess",
-      "destination": "https://color-guess.vercel.app/"
+      "destination": "https://color-guess.vercel.app/project/color-guess"
     },
     {
       "source": "/project/color-guess/:path+",
