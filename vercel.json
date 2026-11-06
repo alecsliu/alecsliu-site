@@ -1,5 +1,12 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/color",
+      "destination": "https://color-guess.alecsliu.com",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
