@@ -1,5 +1,27 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/color",
+      "destination": "/project/color-guess",
+      "permanent": false
+    },
+    {
+      "source": "/projects/color-guess",
+      "destination": "/project/color-guess",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/project/color-guess",
+      "destination": "https://color-guess.vercel.app/"
+    },
+    {
+      "source": "/project/color-guess/:path+",
+      "destination": "https://color-guess.vercel.app/project/color-guess/:path+"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
