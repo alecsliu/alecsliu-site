@@ -14,8 +14,12 @@
   ],
   "rewrites": [
     {
-      "source": "/project/color-guess/:path*",
-      "destination": "https://color-guess.vercel.app/project/color-guess/:path*"
+      "source": "/project/color-guess",
+      "destination": "https://color-guess.vercel.app/"
+    },
+    {
+      "source": "/project/color-guess/:path+",
+      "destination": "https://color-guess.vercel.app/project/color-guess/:path+"
     }
   ],
   "headers": [
