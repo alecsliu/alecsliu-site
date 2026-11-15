@@ -280,6 +280,7 @@ footer {
 .spots .where { color: var(--muted); font-size: 0.9rem; margin-left: 6px; }
 .spots p { margin: 4px 0 0; }
 .spots img { margin: 12px 0 0; }
+.aside { color: var(--muted); font-size: 0.9rem; margin: 12px 0 0; }
 
 /* ---------- Book panel (opens when a Le Petit Prince cover is clicked) ---------- */
 
