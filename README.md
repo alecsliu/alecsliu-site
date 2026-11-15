@@ -12,11 +12,11 @@ images/                    ← put photos here
 reading/index.html         ← Reading: books pulled from Hardcover automatically
 library/index.html         ← Personal library: your blurb + LibraryThing catalogue
 le-petit-prince/index.html ← Le Petit Prince: covers from a LibraryThing collection
-travel/index.html          ← Travel: list of places
-travel/*.html              ← one page per place
-templates/place.html       ← travel: a city guide (bookstores, cafés…)
-templates/list.html        ← travel: a themed list, e.g. "Hikes of 2026"
-templates/trip.html        ← travel: a day-by-day trip journal
+places/index.html          ← Places: list of places
+places/*.html              ← one page per place
+templates/place.html       ← places: a city guide (bookstores, cafés…)
+templates/list.html        ← places: a themed list, e.g. "Hikes of 2026"
+templates/trip.html        ← places: a day-by-day trip journal
 templates/page.html        ← copy this for any other kind of page
 api/reading.js             ← fetches your Hardcover reading list (key: HARDCOVER_TOKEN in Vercel)
 api/_goodreads.js          ← backup source, used only if Hardcover fails
@@ -30,14 +30,14 @@ Look for the comments marked `YOUR BLURB` or `YOUR TEXT` in
 
 ## Adding a new page
 
-1. For a travel place, copy `templates/place.html` into `travel/` and rename it,
-   e.g. `travel/lisbon.html`. Use lowercase with dashes and no spaces.
+1. For a new place, copy `templates/place.html` into `places/` and rename it,
+   e.g. `places/lisbon.html`. Use lowercase with dashes and no spaces.
 2. Open it and follow the notes at the top: change the title, the breadcrumb and the content.
 3. Open that section's `index.html` and copy one `<li>…</li>` block to link to the new page.
    (Delete the "Nothing here yet" line the first time.)
 4. Upload the changed files to GitHub. Vercel updates the site in about a minute.
 
-The page will be live at `alecsliu.com/travel/lisbon`.
+The page will be live at `alecsliu.com/places/lisbon`.
 
 ## Formatting cheat sheet
 

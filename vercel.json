@@ -2,6 +2,16 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/travel",
+      "destination": "/places",
+      "permanent": true
+    },
+    {
+      "source": "/travel/:path*",
+      "destination": "/places/:path*",
+      "permanent": true
+    },
+    {
       "source": "/color",
       "destination": "/project/color-guess",
       "permanent": false
