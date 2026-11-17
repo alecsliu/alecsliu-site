@@ -123,8 +123,9 @@ blockquote {
   font-weight: 600;
 }
 .list .title::after {
-  content: " →";
+  content: "→";
   display: inline-block;
+  margin-left: 0.4em;
   color: var(--accent);
   transition: transform 0.15s;
 }
@@ -421,7 +422,7 @@ dialog.panel .close:hover { color: var(--text); }
 .icon-substack  { --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@13/icons/substack.svg"); }
 .spots a.name { color: var(--text); border-bottom: 1px solid rgba(183, 228, 199, 0.35); }
 .spots a.name:hover { color: var(--accent); border-bottom-color: var(--accent); }
-.spots a.name::after { content: " ↗"; color: var(--accent); font-size: 0.85em; }
+.spots a.name::after { content: "↗"; display: inline-block; margin-left: 0.3em; color: var(--accent); font-size: 0.85em; }
 
 /* ---------- Le Petit Prince map ---------- */
 
@@ -508,4 +509,4 @@ footer .updated { margin: 0 0 4px; }
 .map-zoom button.reset { font-size: 0.95rem; }
 
 .reads .when { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 4px; font-variant-numeric: tabular-nums; }
-.spots a.name.internal::after { content: " →"; }
+.spots a.name.internal::after { content: "→"; }
